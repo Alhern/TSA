@@ -20,6 +20,14 @@ tqdm.pandas(desc="progress-bar")
 # 4) On passe ces tokens dans dataset_prediction()
 # 5) On obtient grâce à calculate_result() les pourcentages de tweets positifs et négatifs.
 
+# MAIN FUNCTIONS:
+# 1- tokenize_tweets(data)
+# 2- calculate_result(result)
+# 3- dataset_prediction(tokens)
+
+# EXTRA FUNCTIONS:
+# 1- predict_this(str)
+# 1- most_common_words(tokens, n)
 
 # ------------------------------------------
 
@@ -49,22 +57,7 @@ tokens = tokenize_tweets(data)
 
 print("Tokens in corpus: ", len(tokens))
 
-# ------------------------------------------
 
-# Si on veut connaître les N mots les plus communs dans notre corpus
-
-def most_common_words(tokens, n):
-    tf = Counter()
-    for t in range(len(tokens)):
-        tf.update(tokens[t])
-    print(f"{n} most common words in corpus:")
-    for tag, count in tf.most_common(n):
-        print(f"{tag}: \t{count}")
-
-
-#most_common_words(tokens, 20)
-
-# ------------------------------------------
 
 # Traduction des prédictions en pourcentage :
 
@@ -99,9 +92,9 @@ def dataset_prediction(tokens):
 dataset_prediction(tokens)
 
 
-# ------------------------------------------
-# EXTRA FUNCTION :
-# Prédiction d'une chaîne
+################# EXTRA FUNCTIONS ################
+
+# Prédiction d'une chaîne (voir tests.py pour des tests) :
 
 def predict_this(str):
     query_tokens = preprocess(str)
@@ -112,3 +105,20 @@ def predict_this(str):
     else:
         print("NEGATIVE: {%s}" % str)
 
+
+#predict_this("I'm tired because my computer is so slow and old, ugh")
+
+
+# Si on veut connaître les N mots les plus communs dans notre corpus
+# (Penser à ajouter les stopwords dans la stoplist de filter.py si on ne veut pas les voir)
+
+def most_common_words(tokens, n):
+    tf = Counter()
+    for t in range(len(tokens)):
+        tf.update(tokens[t])
+    print(f"{n} most common words in corpus:")
+    for tag, count in tf.most_common(n):
+        print(f"{tag}: \t{count}")
+
+
+#most_common_words(tokens, 20)
