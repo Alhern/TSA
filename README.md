@@ -1,2 +1,2 @@
 # TSA
-Twitter Sentiment Analyzer
+Twitter Sentiment Analyzer using Gensim's Word2Vec + NLTK + Keras.
