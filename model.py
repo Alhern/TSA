@@ -1,5 +1,5 @@
 import warnings
-warnings.filterwarnings('ignore',category=FutureWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 import pandas as pd
 pd.options.mode.chained_assignment = None
@@ -63,7 +63,7 @@ def import_dataset():
     df['sentiment'] = df['sentiment'].map({4: 1, 0: 0})
     return df
 
-data = import_dataset()
+# data = import_dataset()
 
 
 ###################################################
@@ -72,11 +72,15 @@ data = import_dataset()
 #                                                 #
 ###################################################
 
-# On va transformer chaque tweet en tokens, on en profite pour virer ce qui nous intéresse pas en utilisant regex : les urls et les mentions
+# On va transformer chaque tweet en tokens, on en profite pour virer ce qui nous intéresse pas
+# en utilisant regex : les urls et les mentions
 
-# Notez que je ne filtre pas les stopwords ici, j'ai remarqué que cela baissait les performances de mon modèle, ce qui est normal puisque si je prends les phrases "i am happy" et "i am not happy" et que je vire "not" qui fait partie des stopwords, les 2 phrases pourtant opposées prennent alors le même sens.
+# Notez que je ne filtre pas les stopwords ici, j'ai remarqué que cela baissait les performances de mon modèle,
+# ce qui est normal puisque si je prends les phrases "i am happy" et "i am not happy" et que je vire "not" qui
+# fait partie des stopwords, les 2 phrases pourtant opposées prennent alors le même sens.
 
-# Enfin notons que je garde aussi les hashtags parce qu'ils sont très souvent utilisés pour rajouter du sens et du contexte à un tweet, par exemple: "Donald did what? #idiot #demon #theworst" ou même "cats are the #greatest".
+# Enfin notons que je garde aussi les hashtags parce qu'ils sont très souvent utilisés pour rajouter du sens
+# et du contexte à un tweet, par exemple: "Donald did what? #idiot #demon #theworst" ou même "cats are the #greatest".
 
 def preprocess(tweet):
 
@@ -90,11 +94,14 @@ def preprocess(tweet):
     tokens = [t for t in tokens if not url.search(t)]
     tokens = [t for t in tokens if not mention.search(t)]
 
-    # Vire les lettres qui se répètent dans un mot, dans la limite de 2 lettres (loveeee => lovee), on limite à 2 sinon on aura un souci avec les mots comme "good" qui deviendrait "god" et prendrait un tout autre sens
+    # Vire les lettres qui se répètent dans un mot, dans la limite de 2 lettres
+    # (loveeee => lovee), on limite à 2 sinon on aura un souci avec les mots comme
+    # "good" qui deviendrait "god" et prendrait un tout autre sens
     tokens = [re.sub(r'(.)\1{2,}', r'\1\1', t) for t in tokens]
 
     # La lemmatization marche très bien avec Word2vec par rapport au stemming
-    # Dans mon cas ça ne me permet pas d'améliorer mes performances de façon importante mais ça me permet de réduire la taille de mon vocabulaire
+    # Dans mon cas ça ne me permet pas d'améliorer mes performances de façon importante
+    # mais ça me permet de réduire la taille de mon vocabulaire
     lemmatizer = WordNetLemmatizer()
     tokens = [lemmatizer.lemmatize(t) for t in tokens]
 
@@ -109,12 +116,12 @@ def postprocess(data, n=1600000):
     return data
 
 
-data = postprocess(data)
+# data = postprocess(data)
 
 
 # Etiquette chaque tweet avec le format 'TRAIN_i', 'TEST_i' ou 'ALLDATA_i'
 
-def tagTweets(corpus, tag_type):
+def tag_tweets(corpus, tag_type):
     tagged = []
     for i, t in tqdm(enumerate(corpus)):
         tag = '%s_%s' % (tag_type, i)
@@ -122,14 +129,14 @@ def tagTweets(corpus, tag_type):
     return tagged
 
 
-# Sur 1M de données, 80% vont être utilisées pour l'entraînement, 20% pour le test de validation afin de pouvoir évaluer la performance du modèle.
-# (1M parce qu'au delà mon OS suffoque et tue le processus)
+# Sur 1M de données, 80% vont être utilisées pour l'entraînement, 20% pour le test de validation
+# afin de pouvoir évaluer la performance du modèle. (1M parce qu'au delà mon OS suffoque et tue le processus)
 
-x_train, x_test, y_train, y_test = train_test_split(np.array(data.head(1000000).tokens), np.array(data.head(1000000).sentiment), test_size=0.2, random_state = 1)
+# x_train, x_test, y_train, y_test = train_test_split(np.array(data.head(1000000).tokens), np.array(data.head(1000000).sentiment), test_size=0.2, random_state=1)
 
-x_train = tagTweets(x_train, 'TRAIN')
-x_test = tagTweets(x_test, 'TEST')
-all_data = tagTweets(np.array(data.tokens), 'ALLDATA')
+# x_train = tag_tweets(x_train, 'TRAIN')
+# x_test = tag_tweets(x_test, 'TEST')
+# all_data = tag_tweets(np.array(data.tokens), 'ALLDATA')
 
 
 ###################################################
@@ -141,10 +148,10 @@ all_data = tagTweets(np.array(data.tokens), 'ALLDATA')
 
 # W2V MODEL CONFIG:
 
-N_DIM = 300 # dimension du vecteur de mot
-WINDOWS = 5 # distance maximale entre le mot cible et les mots autour du mot cible
-SG = 0 # algorithme d'entrainement, soit CBOW (0) soit skip-gram (1)
-MIN_COUNT = 10 # Mots qui apparaissent moins de MIN_COUNT fois seront ignorés
+N_DIM = 300  # dimension du vecteur de mot
+WINDOWS = 5  # distance maximale entre le mot cible et les mots autour du mot cible
+SG = 0  # algorithme d'entrainement, soit CBOW (0) soit skip-gram (1)
+MIN_COUNT = 10  # Mots qui apparaissent moins de MIN_COUNT fois seront ignorés
 
 
 # Initialise le modèle Word2vec, crée son vocabulaire à partir du corpus et l'entraîne
@@ -160,7 +167,7 @@ def w2vmodel_builder(data):
     return w2v_model
 
 
-w2v_model = w2vmodel_builder(all_data)
+# w2v_model = w2vmodel_builder(all_data)
 
 
 ###################################################
@@ -183,21 +190,21 @@ def load_w2vmodel(filename):
     return gensim.models.Word2Vec.load(filename)
 
 
-#print(w2v_model.most_similar('game'))
+# print(w2v_model.most_similar('game'))
 
-#save_w2vmodel(w2v_model, "my_w2vmodel6")
+# save_w2vmodel(w2v_model, "my_w2vmodel6")
 
-#w2v_model = load_w2vmodel("my_w2vmodel6")
-
-
-tfidf = tfidf_builder(all_data)
+w2v_model = load_w2vmodel("my_w2vmodel6")
 
 
-#save_tfidf(tfidf)
+# tfidf = tfidf_builder(all_data)
 
-#tfidf = load_tfidf("tfidf.pickle")
 
-print ('TF-IDF vocabulary size:', len(tfidf))
+# save_tfidf(tfidf)
+
+tfidf = load_tfidf("tfidf.pickle")
+
+print('TF-IDF vocabulary size:', len(tfidf))
 
 
 ###################################################
@@ -206,7 +213,9 @@ print ('TF-IDF vocabulary size:', len(tfidf))
 #                                                 #
 ###################################################
 
-# Construction des vecteurs des mots à partir d'une liste de mots (les tokens des tweets) et la dimension du vecteur, on multiplie ensuite chaque terme du vecteur W2V avec son importance dans TFIDF. Ce dernier point me permet de bien améliorer la performance du modèle.
+# Construction des vecteurs des mots à partir d'une liste de mots (les tokens des tweets)
+# et la dimension du vecteur, on multiplie ensuite chaque terme du vecteur W2V avec
+# son importance dans TFIDF. Ce dernier point me permet de bien améliorer la performance du modèle.
 
 def build_word_vector(tokens, size):
     vec = np.zeros(size).reshape((1, size))
@@ -222,7 +231,8 @@ def build_word_vector(tokens, size):
     return vec
 
 
-# Construction des sets de training et testing pour le modèle à l'aide de build_word_vector(), on va utiliser x_train puis x_test comme argument.
+# Construction des sets de training et testing pour le modèle à l'aide de build_word_vector(),
+# on va utiliser x_train puis x_test comme argument.
 
 def build_training_sets(x_set):
     set_vec = np.concatenate([build_word_vector(z, N_DIM) for z in tqdm(map(lambda x: x.words, x_set))])
@@ -230,8 +240,8 @@ def build_training_sets(x_set):
     return set_vec
 
 
-train_vec = build_training_sets(x_train)
-test_vec = build_training_sets(x_test)
+# train_vec = build_training_sets(x_train)
+# test_vec = build_training_sets(x_test)
 
 
 ###################################################
@@ -251,7 +261,7 @@ def build_model():
     return model
 
 
-model = build_model()
+# model = build_model()
 
 
 ###################################################
@@ -265,7 +275,7 @@ model = build_model()
 EPOCHS = 50    # nombre d'itérations/passages de toutes les données
 BATCH_SIZE_TRAIN = 1024  # plus c'est élevé, plus l'entraînement va vite
 VALIDATION_SPLIT = 0.1   # 10% des données training seront utilisés pour le test
-VERBOSE_TRAIN = 2 # une ligne par epoch, plus lisible
+VERBOSE_TRAIN = 2  # une ligne par epoch, plus lisible
 
 
 # TESTING CONFIG:
@@ -286,10 +296,9 @@ def train_model(model, train_vec, y_train, test_vec, y_test):
     return history, score
 
 
-train_model(model, train_vec, y_train, test_vec, y_test)
+# train_model(model, train_vec, y_train, test_vec, y_test)
 
 
-#save_modeljson(model)
+# save_modeljson(model)
 
-
-#model = load_modeljson("model_config2.json", "model_weights2.h5")
+model = load_modeljson("model_config2.json", "model_weights2.h5")
