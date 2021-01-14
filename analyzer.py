@@ -34,12 +34,12 @@ tqdm.pandas(desc="progress-bar")
 
 # /!\ On doit passer le fichier obtenu avec miner.py  dans valid_json()
 
-#valid_json('tweets_trump.json', 'valid_trump_tweets.json')
+valid_json('data/raw_datasets/tweets_cp.json', 'data/valid_datasets/valid_tweets_cp.json')
 
 
 # On charge le nouveau fichier json avec read_json()
 
-data = read_json('valid_trump_tweets.json')
+data = read_json('data/valid_datasets/valid_trump_tweets.json')
 
 
 # Transforme nos tweets en tokens (nettoyés avec un combo preprocess() + filter_stopwords())
