@@ -20,10 +20,10 @@ from nltk.corpus import stopwords
 # ------------------------------------------
 
 # collection_words sont les mots que l'on utilise pour dataminer nos tweets, ces mots de collection
-# vont alors se retrouver dans tous ou la majorité des tweets. On va donc les enlever parce qu'ils n'apportent
-# rien d'intéressant pour notre analyse :
+# vont alors se retrouver dans tous ou la majorité des tweets. On va donc les enlever parce qu'ils n'apportent rien d'intéressant pour notre analyse :
 
-collection_words = ['#cyberpunk2077', 'cyberpunk', '2077', '#cyberpunk', '@cyberpunkgame']
+collection_words_cp = ['#cyberpunk2077', 'cyberpunk', '2077', '#cyberpunk', '@cyberpunkgame']
+collection_words_trump = ['impeached', 'impeachment']
 
 
 # string.punctuation n'enlève pas toutes les ponctuations trouvé dans le dataset,
@@ -41,7 +41,7 @@ stopwords = stopwords.words('english')
 
 # La stoplist va enfin être composée de plusieurs éléments indésirables :
 
-stoplist = list(string.punctuation) + extra_punct + collection_words
+stoplist = list(string.punctuation) + extra_punct + collection_words_cp
 
 # ------------------------------------------
 
