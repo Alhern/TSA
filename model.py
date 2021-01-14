@@ -41,7 +41,7 @@ from utils import save_modeljson, load_modeljson
 # /!\ Ce dataset de 239MB doit être téléchargé et placé dans le dossier data
 # /!\ Son nom de fichier doit être training.1600000.processed.noemoticon.csv
 
-# Sentiment140 peut être téléchargé via un de ces liens :
+# Sentiment140 peut être téléchargé soit via mon github, soit via un de ces liens :
 # https://docs.google.com/file/d/0B04GJPshIjmPRnZManQwWEdTZjg/edit
 # http://cs.stanford.edu/people/alecmgo/trainingandtestdata.zip
 
@@ -157,12 +157,12 @@ MIN_COUNT = 10  # Mots qui apparaissent moins de MIN_COUNT fois seront ignorés
 # Initialise le modèle Word2vec, crée son vocabulaire à partir du corpus et l'entraîne
 
 def w2vmodel_builder(data):
-    print("INITIALIZING THE W2V MODEL.")
+    print("INITIALIZING THE W2V MODEL")
     w2v_model = Word2Vec(size=N_DIM, sg=SG, window=WINDOWS, min_count=MIN_COUNT)
-    print("BUILDING THE VOCABULARY.")
+    print("BUILDING THE VOCABULARY")
     corpus = [x.words for x in tqdm(data)]
     w2v_model.build_vocab(sentences=corpus)
-    print("TRAINING THE W2V MODEL.")
+    print("TRAINING THE W2V MODEL")
     w2v_model.train(corpus, total_examples=w2v_model.corpus_count, epochs=w2v_model.iter)
     return w2v_model
 
@@ -194,7 +194,7 @@ def load_w2vmodel(filename):
 
 # save_w2vmodel(w2v_model, "my_w2vmodel6")
 
-w2v_model = load_w2vmodel("my_w2vmodel6")
+w2v_model = load_w2vmodel("pretrained/my_w2vmodel")
 
 
 # tfidf = tfidf_builder(all_data)
@@ -202,7 +202,7 @@ w2v_model = load_w2vmodel("my_w2vmodel6")
 
 # save_tfidf(tfidf)
 
-tfidf = load_tfidf("tfidf.pickle")
+tfidf = load_tfidf("pretrained/tfidf.pickle")
 
 print('TF-IDF vocabulary size:', len(tfidf))
 
@@ -298,7 +298,6 @@ def train_model(model, train_vec, y_train, test_vec, y_test):
 
 # train_model(model, train_vec, y_train, test_vec, y_test)
 
-
 # save_modeljson(model)
 
-model = load_modeljson("model_config2.json", "model_weights2.h5")
+model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
