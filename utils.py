@@ -29,7 +29,6 @@ def load_modeljson(filename, weights):
     return model
 
 
-
 ###########################################
 ######### READ/VALIDATE JSON FILE #########
 ###########################################
@@ -40,7 +39,8 @@ def load_modeljson(filename, weights):
 
 # ------------------------------------------
 
-# Le dataset récupéré avec miner.py n'a pas un format json valide, le fichier est une suite de listes contenant des chaînes.
+# Le dataset récupéré avec miner.py n'a pas un format json valide,
+# le fichier est une suite de listes contenant des chaînes.
 # valid_json va transformer ce fichier en fichier json valide.
 
 def valid_json(file, new_file):

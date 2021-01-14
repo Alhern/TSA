@@ -1,5 +1,5 @@
 import warnings
-warnings.filterwarnings('ignore',category=FutureWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
 import numpy as np
 from collections import Counter
 from utils import read_json, valid_json
@@ -34,29 +34,28 @@ tqdm.pandas(desc="progress-bar")
 
 # /!\ On doit passer le fichier obtenu avec miner.py  dans valid_json()
 
-#valid_json('tweets.json', 'valid_tweets.json')
+#valid_json('tweets_trump.json', 'valid_trump_tweets.json')
 
 
 # On charge le nouveau fichier json avec read_json()
 
-data = read_json('final_data.json')
+data = read_json('valid_trump_tweets.json')
 
 
 # Transforme nos tweets en tokens (nettoyés avec un combo preprocess() + filter_stopwords())
 
 def tokenize_tweets(data):
-    l = len(data)
-    list = []
-    for i in range(l):
+    data_length = len(data)
+    tokens = []
+    for i in range(data_length):
         tweet = data[i]['text']
-        list.append(filter_stopwords(preprocess(tweet)))
-    return list
+        tokens.append(filter_stopwords(preprocess(tweet)))
+    return tokens
 
 
 tokens = tokenize_tweets(data)
 
 print("Tokens in corpus: ", len(tokens))
-
 
 
 # Traduction des prédictions en pourcentage :
@@ -77,7 +76,8 @@ def calculate_result(result):
     print("Negative: %.2f%%" % neg_tweets)
 
 
-# Prédictions sur une liste de tokens, on va se servir des tokens qu'on a récupéré dans notre corpus json avec tokenize_tweets()
+# Prédictions sur une liste de tokens,
+# on va se servir des tokens qu'on a récupéré dans notre corpus json avec tokenize_tweets()
 
 def dataset_prediction(tokens):
     tokens = np.array(tokens, dtype=object)
@@ -106,7 +106,7 @@ def predict_this(str):
         print("NEGATIVE: {%s}" % str)
 
 
-#predict_this("I'm tired because my computer is so slow and old, ugh")
+# predict_this("I'm tired because my computer is so slow and old, ugh")
 
 
 # Si on veut connaître les N mots les plus communs dans notre corpus
@@ -121,4 +121,4 @@ def most_common_words(tokens, n):
         print(f"{tag}: \t{count}")
 
 
-#most_common_words(tokens, 20)
+# most_common_words(tokens, 20)
