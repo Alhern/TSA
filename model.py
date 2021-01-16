@@ -291,7 +291,7 @@ def train_model(model, train_vec, y_train, test_vec, y_test):
 
     # Testing:
     score = model.evaluate(test_vec, y_test, batch_size=BATCH_SIZE_TEST, verbose=VERBOSE_TEST)
-    print('Loss: %.2f%%\nAccuracy: %.2f%%' % (score[0], score[1]))
+    print('Test loss: %.2f%%\nTest accuracy: %.2f%%' % (score[0], score[1]))
 
     return history, score
 
