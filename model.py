@@ -269,7 +269,7 @@ def train_model(model, train_vec, y_train, test_vec, y_test):
 #w2v_model = w2vmodel_builder(all_data)
 
 #save_w2vmodel(w2v_model, "my_w2vmodel8")
-w2v_model = load_w2vmodel("pretrained/model_2/my_w2vmodel")
+w2v_model = load_w2vmodel("pretrained/my_w2vmodel")
 
 #print(w2v_model.most_similar("can"))
 
@@ -279,7 +279,7 @@ w2v_model = load_w2vmodel("pretrained/model_2/my_w2vmodel")
 #tfidf = tfidf_builder(all_data)
 
 #save_tfidf(tfidf, "tf2")
-tfidf = load_tfidf("pretrained/model_2/tfidf.pickle")
+tfidf = load_tfidf("pretrained/tfidf.pickle")
 
 print('TF-IDF vocabulary size:', len(tfidf))
 
@@ -297,4 +297,4 @@ print('TF-IDF vocabulary size:', len(tfidf))
 #train_model(model, train_vec, y_train, test_vec, y_test)
 
 #save_modeljson(model)
-model = load_modeljson("pretrained/model_2/model_config.json", "pretrained/model_2/model_weights.h5")
+model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
