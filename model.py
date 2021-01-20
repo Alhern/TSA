@@ -2,19 +2,17 @@ import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 import pandas as pd
+from tqdm import tqdm
+tqdm.pandas(desc="progress-bar")
 pd.options.mode.chained_assignment = None
 import numpy as np
 from copy import deepcopy
 import h5py
-
 import re
 
 import gensim
 from gensim.models.word2vec import Word2Vec
 from gensim.models.doc2vec import TaggedDocument
-
-from tqdm import tqdm
-tqdm.pandas(desc="progress-bar")
 
 import nltk
 from nltk.tokenize import TweetTokenizer
@@ -63,8 +61,6 @@ def import_dataset():
     df['sentiment'] = df['sentiment'].map({4: 1, 0: 0})
     return df
 
-# data = import_dataset()
-
 
 ###################################################
 #                                                 #
@@ -90,14 +86,15 @@ def preprocess(tweet):
 
     # Vire les tokens qu'on ne veut pas garder :
     url = re.compile('https?://[A-Za-z0-9./]+')  # url
-    mention = re.compile('(?<![\w.-])@(\w+)')   # mentions
+    mention = re.compile('@(\w+)')   # mentions
     tokens = [t for t in tokens if not url.search(t)]
     tokens = [t for t in tokens if not mention.search(t)]
+    tokens = [t for t in tokens if not t.isdigit()]  # on vire les nombres
 
-    # Vire les lettres qui se répètent dans un mot, dans la limite de 2 lettres
+    # OPTION : Vire les lettres qui se répètent dans un mot, dans la limite de 2 lettres
     # (loveeee => lovee), on limite à 2 sinon on aura un souci avec les mots comme
     # "good" qui deviendrait "god" et prendrait un tout autre sens
-    tokens = [re.sub(r'(.)\1{2,}', r'\1\1', t) for t in tokens]
+    #tokens = [re.sub(r'(.)\1{2,}', r'\1\1', t) for t in tokens]
 
     # La lemmatization marche très bien avec Word2vec par rapport au stemming
     # Dans mon cas ça ne me permet pas d'améliorer mes performances de façon importante
@@ -114,29 +111,6 @@ def postprocess(data, n=1600000):
     data = data.head(n).copy(deep=True)
     data['tokens'] = data['text'].progress_map(preprocess)
     return data
-
-
-# data = postprocess(data)
-
-
-# Etiquette chaque tweet avec le format 'TRAIN_i', 'TEST_i' ou 'ALLDATA_i'
-
-def tag_tweets(corpus, tag_type):
-    tagged = []
-    for i, t in tqdm(enumerate(corpus)):
-        tag = '%s_%s' % (tag_type, i)
-        tagged.append(TaggedDocument(t, [tag]))
-    return tagged
-
-
-# Sur 1M de données, 80% vont être utilisées pour l'entraînement, 20% pour le test de validation
-# afin de pouvoir évaluer la performance du modèle. (1M parce qu'au delà mon OS suffoque et tue le processus)
-
-# x_train, x_test, y_train, y_test = train_test_split(np.array(data.head(1000000).tokens), np.array(data.head(1000000).sentiment), test_size=0.2, random_state=1)
-
-# x_train = tag_tweets(x_train, 'TRAIN')
-# x_test = tag_tweets(x_test, 'TEST')
-# all_data = tag_tweets(np.array(data.tokens), 'ALLDATA')
 
 
 ###################################################
@@ -160,14 +134,10 @@ def w2vmodel_builder(data):
     print("INITIALIZING THE W2V MODEL")
     w2v_model = Word2Vec(size=N_DIM, sg=SG, window=WINDOWS, min_count=MIN_COUNT)
     print("BUILDING THE VOCABULARY")
-    corpus = [x.words for x in tqdm(data)]
-    w2v_model.build_vocab(sentences=corpus)
+    w2v_model.build_vocab(sentences=data)
     print("TRAINING THE W2V MODEL")
-    w2v_model.train(corpus, total_examples=w2v_model.corpus_count, epochs=w2v_model.iter)
+    w2v_model.train(data, total_examples=w2v_model.corpus_count, epochs=w2v_model.iter)
     return w2v_model
-
-
-# w2v_model = w2vmodel_builder(all_data)
 
 
 ###################################################
@@ -188,23 +158,6 @@ def save_w2vmodel(model, filename):
 def load_w2vmodel(filename):
     print("Loading the W2V model from disk...")
     return gensim.models.Word2Vec.load(filename)
-
-
-# print(w2v_model.most_similar('game'))
-
-# save_w2vmodel(w2v_model, "my_w2vmodel6")
-
-w2v_model = load_w2vmodel("pretrained/my_w2vmodel")
-
-
-# tfidf = tfidf_builder(all_data)
-
-
-# save_tfidf(tfidf)
-
-tfidf = load_tfidf("pretrained/tfidf.pickle")
-
-print('TF-IDF vocabulary size:', len(tfidf))
 
 
 ###################################################
@@ -235,13 +188,9 @@ def build_word_vector(tokens, size):
 # on va utiliser x_train puis x_test comme argument.
 
 def build_training_sets(x_set):
-    set_vec = np.concatenate([build_word_vector(z, N_DIM) for z in tqdm(map(lambda x: x.words, x_set))])
+    set_vec = np.concatenate([build_word_vector(x, N_DIM) for x in x_set])
     set_vec = scale(set_vec)
     return set_vec
-
-
-# train_vec = build_training_sets(x_train)
-# test_vec = build_training_sets(x_test)
 
 
 ###################################################
@@ -261,9 +210,6 @@ def build_model():
     return model
 
 
-# model = build_model()
-
-
 ###################################################
 #                                                 #
 #          MODEL TRAINING AND EVALUATION          #
@@ -272,8 +218,8 @@ def build_model():
 
 # TRAINING CONFIG:
 
-EPOCHS = 50    # nombre d'itérations/passages de toutes les données
-BATCH_SIZE_TRAIN = 1024  # plus c'est élevé, plus l'entraînement va vite
+EPOCHS = 30    # nombre d'itérations/passages de toutes les données
+BATCH_SIZE_TRAIN = 1024  # plus c'est élevé, plus l'entraînement va vite mais peut faire baisser la précision
 VALIDATION_SPLIT = 0.1   # 10% des données training seront utilisés pour le test
 VERBOSE_TRAIN = 2  # une ligne par epoch, plus lisible
 
@@ -296,8 +242,59 @@ def train_model(model, train_vec, y_train, test_vec, y_test):
     return history, score
 
 
-# train_model(model, train_vec, y_train, test_vec, y_test)
+###################################################
+#                                                 #
+#                START THE ENGINE!                #
+#                                                 #
+###################################################
 
-# save_modeljson(model)
+### Toutes nos fonctions sont prêtes, il est temps de démarrer la machine
 
-model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
+#### IMPORTING & PROCESSING SENTIMENT140:
+
+#data = import_dataset()
+#data = postprocess(data)
+
+
+#### SPLITTING OUR DATA:
+# Sur 1M de données, 80% vont être utilisées pour l'entraînement, 20% pour le test de validation
+# afin de pouvoir évaluer la performance du modèle. (1M parce qu'au delà mon OS suffoque et tue le processus)
+
+#x_train, x_test, y_train, y_test = train_test_split(np.array(data.head(1000000).tokens), np.array(data.head(1000000).sentiment), test_size=0.2, random_state=1)
+#all_data = np.array(data.tokens)
+
+
+#### BUILDING THE W2V MODEL & SAVING/LOADING IT TO/FROM DISK:
+
+#w2v_model = w2vmodel_builder(all_data)
+
+#save_w2vmodel(w2v_model, "my_w2vmodel8")
+w2v_model = load_w2vmodel("pretrained/model_2/my_w2vmodel")
+
+#print(w2v_model.most_similar("can"))
+
+
+#### BUILDING THE TF-IDF MATRIX & SAVING/LOADING IT TO/FROM DISK:
+
+#tfidf = tfidf_builder(all_data)
+
+#save_tfidf(tfidf, "tf2")
+tfidf = load_tfidf("pretrained/model_2/tfidf.pickle")
+
+print('TF-IDF vocabulary size:', len(tfidf))
+
+
+#### BUILDING THE TRAINING & TESTING SETS:
+#train_vec = build_training_sets(x_train)
+#test_vec = build_training_sets(x_test)
+
+
+#### BUILDING OUR SEQUENTIAL MODEL WITH KERAS
+#model = build_model()
+
+
+#### TRAINING THE MODEL & SAVING/LOADING IT TO/FROM DISK:
+#train_model(model, train_vec, y_train, test_vec, y_test)
+
+#save_modeljson(model)
+model = load_modeljson("pretrained/model_2/model_config.json", "pretrained/model_2/model_weights.h5")
