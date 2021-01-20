@@ -26,15 +26,15 @@ import pickle
 
 def tfidf_builder(corpus):
     vectorizer = TfidfVectorizer(analyzer=lambda x: x, min_df=10)
-    vectorizer.fit_transform([x.words for x in corpus])
+    vectorizer.fit_transform(corpus)
     return dict(zip(vectorizer.get_feature_names(), vectorizer.idf_))
 
 
 # Sauvegarde du vecteur TF-IDF sur l'ordi via Pickle
 
-def save_tfidf(tfidf):
+def save_tfidf(tfidf, filename):
     print("Pickling the TF-IDF vector...")
-    with open("tfidf.pickle", "wb") as f:
+    with open(filename + ".pickle", "wb") as f:
         pickle.dump(tfidf, f)
 
 
