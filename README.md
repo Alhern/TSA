@@ -18,3 +18,4 @@ This program has been built with:
 * `gensim`
 * `tensorflow`
 * `nltk`
+* `scikit-learn`
