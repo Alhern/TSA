@@ -54,8 +54,12 @@ from utils import save_modeljson, load_modeljson
 # On va garder que les colonnes qui nous intéresse : polarité/sentiment et texte.
 # Pour plus de clarté, le sentiment positif 4 = 1.
 
+
+TRAINING_DATASET_PATH = "data/training.1600000.processed.noemoticon.csv"
+
+
 def import_dataset():
-    df = pd.read_csv("data/training.1600000.processed.noemoticon.csv", encoding="latin1", error_bad_lines=False)
+    df = pd.read_csv(TRAINING_DATASET_PATH, encoding="latin1", error_bad_lines=False)
     df.columns = ['sentiment', 'id', 'time', 'query', 'source', 'text']
     df = df.drop(['id', 'time', 'query', 'source'], axis=1)
     df['sentiment'] = df['sentiment'].map({4: 1, 0: 0})
@@ -136,7 +140,7 @@ def w2vmodel_builder(data):
     print("BUILDING THE VOCABULARY")
     w2v_model.build_vocab(sentences=data)
     print("TRAINING THE W2V MODEL")
-    w2v_model.train(data, total_examples=w2v_model.corpus_count, epochs=w2v_model.iter)
+    w2v_model.train(data, total_examples=w2v_model.corpus_count, epochs=w2v_model.epochs)
     return w2v_model
 
 
@@ -252,49 +256,49 @@ def train_model(model, train_vec, y_train, test_vec, y_test):
 
 #### IMPORTING & PROCESSING SENTIMENT140:
 
-#data = import_dataset()
-#data = postprocess(data)
+data = import_dataset()
+data = postprocess(data)
 
 
 #### SPLITTING OUR DATA:
 # Sur 1M de données, 80% vont être utilisées pour l'entraînement, 20% pour le test de validation
 # afin de pouvoir évaluer la performance du modèle. (1M parce qu'au delà mon OS suffoque et tue le processus)
 
-#x_train, x_test, y_train, y_test = train_test_split(np.array(data.head(1000000).tokens), np.array(data.head(1000000).sentiment), test_size=0.2, random_state=1)
-#all_data = np.array(data.tokens)
+x_train, x_test, y_train, y_test = train_test_split(np.array(data.head(1000000).tokens), np.array(data.head(1000000).sentiment), test_size=0.2, random_state=1)
+all_data = np.array(data.tokens)
 
 
 #### BUILDING THE W2V MODEL & SAVING/LOADING IT TO/FROM DISK:
 
-#w2v_model = w2vmodel_builder(all_data)
+w2v_model = w2vmodel_builder(all_data)
 
 #save_w2vmodel(w2v_model, "my_w2vmodel8")
-w2v_model = load_w2vmodel("pretrained/my_w2vmodel")
+#w2v_model = load_w2vmodel("pretrained/my_w2vmodel")
 
-#print(w2v_model.most_similar("can"))
+#print(w2v_model.most_similar("pretty"))
 
 
 #### BUILDING THE TF-IDF MATRIX & SAVING/LOADING IT TO/FROM DISK:
 
-#tfidf = tfidf_builder(all_data)
+tfidf = tfidf_builder(all_data)
 
 #save_tfidf(tfidf, "tf2")
-tfidf = load_tfidf("pretrained/tfidf.pickle")
+#tfidf = load_tfidf("pretrained/tfidf.pickle")
 
-print('TF-IDF vocabulary size:', len(tfidf))
+#print('TF-IDF vocabulary size:', len(tfidf))
 
 
 #### BUILDING THE TRAINING & TESTING SETS:
-#train_vec = build_training_sets(x_train)
-#test_vec = build_training_sets(x_test)
+train_vec = build_training_sets(x_train)
+test_vec = build_training_sets(x_test)
 
 
 #### BUILDING OUR SEQUENTIAL MODEL WITH KERAS
-#model = build_model()
+model = build_model()
 
 
 #### TRAINING THE MODEL & SAVING/LOADING IT TO/FROM DISK:
-#train_model(model, train_vec, y_train, test_vec, y_test)
+train_model(model, train_vec, y_train, test_vec, y_test)
 
 #save_modeljson(model)
-model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
+#model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
