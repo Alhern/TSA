@@ -25,7 +25,9 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 # J'ai aussi récupéré des données concernant le 2nd impeachment de Trump, au moment où cela a été annoncé.
 # J'ai ainsi pu récupérer plus de 24k tweets en quelques minutes seulement.
-QUERY = ["#Cyberpunk2077"]
+
+#QUERY = ["#Cyberpunk2077"]
+QUERY = []
 
 
 ################ THE MINER'S HEART ################
@@ -78,11 +80,19 @@ class Listener(StreamListener):
         return True
 
 
+################ GETTING USER QUERIES ################
+
+def get_query():
+    user_query = input("Enter your queries (separated by commas): ").split(',')
+    return [x.strip() for x in user_query]
+
+
 ################ START THE STREAM ################
 
 def main():
     stream = None
     try:
+        QUERY = get_query()
         print("NOW MINING.... Ctrl+C to interrupt the stream.")
         stream = tweepy.Stream(auth, Listener())
         stream.filter(track=QUERY, languages=["en"], encoding='utf-8')
