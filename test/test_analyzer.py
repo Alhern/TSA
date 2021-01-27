@@ -7,6 +7,10 @@ import io
 import unittest
 from unittest.mock import patch
 
+
+# / ! \ To run those tests, make sure only the following instruction is uncommented in model.py :
+# model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
+
 class TestAnalyzer(unittest.TestCase):
 
     def test_tokenize_tweets(self):

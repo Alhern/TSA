@@ -9,6 +9,9 @@ import io
 import sys
 
 
+# / ! \ To run those tests, make sure only the following instruction is uncommented in model.py :
+# model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
+
 filename = 'test_sentiment.csv'
 test_df = pandas.read_csv(filename, encoding="latin1", error_bad_lines=False)
 
