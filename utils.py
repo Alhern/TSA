@@ -24,8 +24,9 @@ def save_modeljson(model):
 # Loading the model configuration and its weights
 
 def load_modeljson(filename, weights):
-    model = model_from_json(open(filename).read())
-    model.load_weights(weights)
+    with open(filename) as f:
+        model = model_from_json(f.read())
+        model.load_weights(weights)
     return model
 
 
