@@ -29,18 +29,8 @@ tqdm.pandas(desc="progress-bar")
 # 1- predict_this(str)
 # 1- most_common_words(tokens, n)
 
-# ------------------------------------------
 
-
-# /!\ On doit passer le fichier obtenu avec miner.py  dans valid_json()
-
-valid_json('data/raw_datasets/tweets_cp.json', 'data/valid_datasets/valid_tweets_cp.json')
-
-
-# On charge le nouveau fichier json avec read_json()
-
-data = read_json('data/valid_datasets/valid_trump_tweets.json')
-
+################# MAIN FUNCTIONS ################
 
 # Transforme nos tweets en tokens (nettoyés avec un combo preprocess() + filter_stopwords())
 
@@ -51,11 +41,6 @@ def tokenize_tweets(data):
         tweet = data[i]['text']
         tokens.append(filter_stopwords(preprocess(tweet)))
     return tokens
-
-
-tokens = tokenize_tweets(data)
-
-print("Tokens in corpus: ", len(tokens))
 
 
 # Traduction des prédictions en pourcentage :
@@ -86,10 +71,6 @@ def dataset_prediction(tokens):
     result = model.predict_classes(query_vec)
     calculate_result(result)
 
-
-# Time to predict, on va calculer les taux de sentiments positifs et négatifs se trouvant dans notre corpus de tweets:
-
-dataset_prediction(tokens)
 
 
 ################# EXTRA FUNCTIONS ################
@@ -122,3 +103,29 @@ def most_common_words(tokens, n):
 
 
 # most_common_words(tokens, 20)
+
+
+###################################################
+#                                                 #
+#                START THE ENGINE!                #
+#                                                 #
+###################################################
+
+
+def main():
+
+    # /!\ On doit passer le fichier obtenu avec miner.py  dans valid_json()
+    # valid_json('data/raw_datasets/tweets_cp.json', 'data/valid_datasets/valid_tweets_cp.json')
+
+    # On charge le nouveau fichier json avec read_json()
+    data = read_json('data/valid_datasets/valid_trump_tweets.json')
+    tokens = tokenize_tweets(data)
+
+    # print("Tokens in corpus: ", len(tokens))
+
+    # Time to predict, on va calculer les taux de sentiments positifs et négatifs se trouvant dans notre corpus de tweets:
+    dataset_prediction(tokens)
+
+
+if __name__ == "__main__":
+    main()
