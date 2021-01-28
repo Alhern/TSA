@@ -5,6 +5,7 @@ from collections import Counter
 from utils import read_json, valid_json
 from filter import filter_stopwords
 from model import preprocess, build_word_vector, model, N_DIM
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 tqdm.pandas(desc="progress-bar")
 
@@ -45,7 +46,7 @@ def tokenize_tweets(data):
 
 # Traduction des prédictions en pourcentage :
 
-def calculate_result(result):
+def calculate_result(result, plot=False):
     neg = 0
     pos = 0
     for i, j in enumerate(result):
@@ -60,6 +61,16 @@ def calculate_result(result):
     print("Positive: %.2f%%" % pos_tweets)
     print("Negative: %.2f%%" % neg_tweets)
 
+    # Si on veut un pie chart en plus :
+    if plot:
+        plt.pie([pos_tweets, neg_tweets],
+                labels=['Positive tweets','Negative tweets'],
+                colors=['limegreen','crimson'],
+                startangle=90,
+                autopct='%1.1f%%')
+        plt.title('Sentiment analysis:')
+        plt.show()
+
 
 # Prédictions sur une liste de tokens,
 # on va se servir des tokens qu'on a récupéré dans notre corpus json avec tokenize_tweets()
@@ -69,7 +80,7 @@ def dataset_prediction(tokens):
     print("Analyzing sentiments...")
     query_vec = np.concatenate([build_word_vector(t, N_DIM) for t in tqdm(map(lambda x: x, tokens))])
     result = model.predict_classes(query_vec)
-    calculate_result(result)
+    calculate_result(result, True) # False si on ne veut pas de pie chart
 
 
 
