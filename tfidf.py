@@ -24,8 +24,10 @@ import pickle
 
 # Construction du vecteur TF-IDF à partir du corpus de tweets
 
+MIN_DF = 10
+
 def tfidf_builder(corpus):
-    vectorizer = TfidfVectorizer(analyzer=lambda x: x, min_df=10)
+    vectorizer = TfidfVectorizer(analyzer=lambda x: x, min_df=MIN_DF)
     vectorizer.fit_transform(corpus)
     return dict(zip(vectorizer.get_feature_names(), vectorizer.idf_))
 
