@@ -13,9 +13,11 @@ Your authentication details will need to be placed directly inside `miner.py` OR
 
 This program has been built with:
 
-* `Python 3`
+* `Python 3.6`
 * `tweepy`
 * `gensim`
 * `tensorflow`
 * `nltk`
 * `scikit-learn`
+
+⚠️Python 3.6 is recommended to run this program.
