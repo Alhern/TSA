@@ -76,16 +76,23 @@ def word_embedding_space_plot(w2vmodel):
 ###### VISUALISATION DE LA LOI DE ZIPF ######
 
 def zipf_plot():
-
-    y = [count for tag, count in tf.most_common(200)]
+    y = [count for tag, count in tf.most_common()]
     x = range(1, len(y) + 1)
 
-    plt.figure(figsize=(10,8))
-    plt.bar(x, y, color='deepskyblue')
-    plt.plot(x, y)
-    plt.title("Fréquences des termes")
-    plt.ylabel("Fréquence")
-    plt.xlabel("Termes")
+    plt.figure(figsize=(10, 8))
+    plt.ylim(1, 10**4)
+    plt.xlim(1, 10**4)
+
+    plt.loglog(x, y, marker=".", color='deepskyblue', label="Corpus")
+
+    plt.plot([1, y[0]], [y[0],1], color='crimson', label="Loi de Zipf")
+
+    plt.legend(loc="lower left")
+
+    plt.title("Loi de Zipf sur une échelle log-log")
+    plt.ylabel("Fréquence des termes")
+    plt.xlabel("Rang des termes")
+
     plt.margins(0, 0)
     plt.tight_layout()
 
@@ -100,7 +107,7 @@ def term_distribution_plot():
 
     y = [count for tag, count in tf.most_common(30)]
     x = [tag for tag, count in tf.most_common(30)]
-    
+
     plt.bar(x, y, color='deepskyblue')
     plt.plot(x, y, color='r', linestyle='-',linewidth=1)
     plt.title("Fréquences des termes (30)")
@@ -167,7 +174,7 @@ def bigram_network_plot(terms):
 #### CHOOSE YOUR PLOT! ####
 ###########################
 
-#word_embedding_space_plot(w2v_model)
-#zipf_plot()
-#term_distribution_plot()
-#bigram_network_plot(terms)
+word_embedding_space_plot(w2v_model)
+zipf_plot()
+term_distribution_plot()
+bigram_network_plot(terms)
