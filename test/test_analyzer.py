@@ -1,28 +1,3 @@
-import analyzer
-import utils
-import tempfile
-import sys
-import os
-import io
-import unittest
-from unittest.mock import patch
-
-
-# / ! \ To run those tests, make sure only the following instruction is uncommented in model.py :
-# model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
-
-class TestAnalyzer(unittest.TestCase):
-
-    def test_tokenize_tweets(self):
-        with patch('sys.stdout', new=io.StringIO()):
-            utils.valid_json("test_raw_tweets.json")
-            test_data = utils.read_json("valid_test_raw_tweets.json")
-            expected_result = ['finally', 'got', 'a', '#cyberpunk2077', 'crash', 'with', 'first', 'after', 'hour', 'still', 'not', 'good', 'to', 'see', 'a', 'game', 'crash', 'b']
-            test_tokens = analyzer.tokenize_tweets(test_data)
-            self.assertEqual(test_tokens[0], expected_result)
-            sys.stdout = sys.__stdout__
-
-
-
-if __name__ == '__main__':
-    unittest.main()
+version https://git-lfs.github.com/spec/v1
+oid sha256:1eff02222bc4cbf5cc5350dbf3e171fa3b97d9604c1ef5a659ead4e1a7e34550
+size 957
