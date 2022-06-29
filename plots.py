@@ -1,11 +1,13 @@
-from model import load_w2vmodel
-from analyzer import tokenize_tweets
+import model
+import analyzer
 from utils import read_json
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from collections import Counter
 from nltk import bigrams
 import networkx as nx
+import warnings
+warnings.filterwarnings('ignore', category=RuntimeWarning)
 import itertools
 import pandas as pd
 
@@ -23,19 +25,6 @@ import pandas as pd
 # 3) term_distribution_plot()
 # 4) bigram_network_plot
 
-### REQUIRED ###
-# For word embedding space:
-w2v_model = load_w2vmodel("pretrained/my_w2vmodel")
-
-# For Zipf's law:
-data = read_json('data/valid_datasets/valid_trump_tweets.json')
-tokens = tokenize_tweets(data)
-tf = Counter()
-for t in range(len(tokens)):
-    tf.update(tokens[t])
-
-# For bigram network:
-terms = [list(bigrams(tweet)) for tweet in tokens]
 
 
 # -------------------------------------------------------
@@ -75,7 +64,7 @@ def word_embedding_space_plot(w2vmodel):
 
 ###### VISUALISATION DE LA LOI DE ZIPF ######
 
-def zipf_plot():
+def zipf_plot(tf):
     y = [count for tag, count in tf.most_common()]
     x = range(1, len(y) + 1)
 
@@ -103,7 +92,7 @@ def zipf_plot():
 
 ###### VISUALISATION DE LA DISTRIBUTION DES TERMES ######
 
-def term_distribution_plot():
+def term_distribution_plot(tf):
 
     y = [count for tag, count in tf.most_common(30)]
     x = [tag for tag, count in tf.most_common(30)]
@@ -174,7 +163,26 @@ def bigram_network_plot(terms):
 #### CHOOSE YOUR PLOT! ####
 ###########################
 
-word_embedding_space_plot(w2v_model)
-zipf_plot()
-term_distribution_plot()
-bigram_network_plot(terms)
+def all_plots(filename):
+    ### REQUIRED ###
+    # For word embedding space:
+    w2v_model = model.w2v_model
+
+    print("\nPLOTTING... PLEASE WAIT.")
+
+    data = read_json(filename)
+    tokens = analyzer.tokenize_tweets(data)
+    tf = Counter()
+    for t in range(len(tokens)):
+        tf.update(tokens[t])
+
+    # For bigram network:
+    terms = [list(bigrams(tweet)) for tweet in tokens]
+
+    word_embedding_space_plot(w2v_model)
+    zipf_plot(tf)
+    term_distribution_plot(tf)
+    bigram_network_plot(terms)
+
+    print("Done! Thank you for using TSA.")
+

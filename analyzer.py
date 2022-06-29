@@ -4,6 +4,8 @@ import numpy as np
 from collections import Counter
 from utils import read_json, valid_json
 from filter import filter_stopwords
+import miner
+import plots
 from model import preprocess, build_word_vector, model, N_DIM
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -28,7 +30,7 @@ tqdm.pandas(desc="progress-bar")
 
 # EXTRA FUNCTIONS:
 # 1- predict_this(str)
-# 1- most_common_words(tokens, n)
+# 2- most_common_words(tokens, n)
 
 
 ################# MAIN FUNCTIONS ################
@@ -77,7 +79,7 @@ def calculate_result(result, plot=False):
 
 def dataset_prediction(tokens):
     tokens = np.array(tokens, dtype=object)
-    print("Analyzing sentiments...")
+    print("\nAnalyzing sentiments...")
     query_vec = np.concatenate([build_word_vector(t, N_DIM) for t in tqdm(map(lambda x: x, tokens))])
     result = model.predict_classes(query_vec)
     calculate_result(result, True) # False si on ne veut pas de pie chart
@@ -113,8 +115,6 @@ def most_common_words(tokens, n):
         print(f"{tag}: \t{count}")
 
 
-# most_common_words(tokens, 20)
-
 
 ###################################################
 #                                                 #
@@ -125,17 +125,62 @@ def most_common_words(tokens, n):
 
 def main():
 
-    # /!\ On doit passer le fichier obtenu avec miner.py  dans valid_json()
-    # valid_json('data/raw_datasets/tweets_cp.json', 'data/valid_datasets/valid_tweets_cp.json')
+    print("Welcome to TSA!")
+    print("What would you like to do?\n")
+    print("\t1) Mine tweets")
+    print("\t2) Validate a json file")
+    print("\t3) Analyze a corpus of tweets")
+    print("\t4) Find the most common words in a corpus of tweets")
+    print("\t5) Predict a string")
 
-    # On charge le nouveau fichier json avec read_json()
-    data = read_json('data/valid_datasets/valid_trump_tweets.json')
-    tokens = tokenize_tweets(data)
+    choice = input("\nEnter your choice: ")
 
-    # print("Tokens in corpus: ", len(tokens))
+    if choice == "1":
+        miner.main()
 
-    # Time to predict, on va calculer les taux de sentiments positifs et négatifs se trouvant dans notre corpus de tweets:
-    dataset_prediction(tokens)
+    elif choice == "2":
+        path = input("Enter the path to the json file: ")
+        try:
+            valid_json(path)
+            exit(0)
+        except:
+            exit(1)
+
+    # /!\ On doit avoir passé le fichier obtenu avec miner.py dans valid_json() avant de lancer cette fonction
+    elif choice == "3":
+
+        # On charge le nouveau fichier json avec read_json()
+        path = input("Enter the path to the JSON corpus you want to analyze: ")
+        extra = input("Would you like to visualize extra data? (y/n): ")
+        try:
+            data = read_json(path)
+            tokens = tokenize_tweets(data)
+            # Time to predict, on va calculer les taux de sentiments positifs et négatifs se trouvant dans notre corpus de tweets:
+            dataset_prediction(tokens)
+
+            if extra.lower() == "y":
+                plots.all_plots(path)
+        except:
+            exit(1)
+
+    elif choice == "4":
+        num = int(input("Enter the number of most common words you want to see: "))
+        path = input("Enter the path to the JSON corpus you want to analyze: ")
+        try:
+            data = read_json(path)
+            tokens = tokenize_tweets(data)
+            most_common_words(tokens, num)
+        except:
+            exit(1)
+
+
+    elif choice == "5":
+        string = input("Enter the string you want to predict: ")
+        predict_this(string)
+
+    else:
+        print("Invalid choice\n Please try entering 1, 2, 3 or 4.")
+        exit(1)
 
 
 if __name__ == "__main__":

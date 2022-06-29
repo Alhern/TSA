@@ -30,7 +30,7 @@ collection_words_trump = ['impeached', 'impeachment']
 collection_words = []
 
 
-# string.punctuation n'enlève pas toutes les ponctuations trouvé dans le dataset,
+# string.punctuation n'enlève pas toutes les ponctuations trouvées dans le dataset,
 # on va alors les rajouter dans les extra :
 
 extra_punct = ['…', '...', '’', '..', '️']
