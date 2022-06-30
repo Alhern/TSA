@@ -80,7 +80,7 @@ def calculate_result(result, plot=False):
 def dataset_prediction(tokens):
     tokens = np.array(tokens, dtype=object)
     print("\nAnalyzing sentiments...")
-    query_vec = np.concatenate([build_word_vector(w2v_model, tfidf, N_DIM) for t in tqdm(map(lambda x: x, tokens))])
+    query_vec = np.concatenate([build_word_vector(w2v_model, tfidf, t, N_DIM) for t in tqdm(map(lambda x: x, tokens))])
     result = model.predict_classes(query_vec)
     calculate_result(result, True) # False si on ne veut pas de pie chart
 
@@ -152,7 +152,8 @@ def main():
         try:
             valid_json(path)
             exit(0)
-        except:
+        except Exception as e:
+            print(e)
             exit(1)
 
     # /!\ On doit avoir passé le fichier obtenu avec miner.py dans valid_json() avant de lancer cette fonction
@@ -169,17 +170,19 @@ def main():
 
             if extra.lower() == "y":
                 plots.all_plots(path)
-        except:
+        except Exception as e:
+            print(e)
             exit(1)
 
     elif choice == "4":
-        num = int(input("Enter the number of most common words you want to see: "))
+        num = int(input("Enter the number of the most common words you want to see: "))
         path = input("Enter the path to the JSON corpus you want to analyze: ")
         try:
             data = read_json(path)
             tokens = tokenize_tweets(data)
             most_common_words(tokens, num)
-        except:
+        except Exception as e:
+            print(e)
             exit(1)
 
     elif choice == "5":
