@@ -179,7 +179,7 @@ def load_w2vmodel(filename):
 # et la dimension du vecteur, on multiplie ensuite chaque terme du vecteur W2V avec
 # son importance dans TFIDF. Ce dernier point me permet de bien améliorer la performance du modèle.
 
-def build_word_vector(tokens, size):
+def build_word_vector(w2v_model, tfidf, tokens, size):
     vec = np.zeros(size).reshape((1, size))
     count = 0.
     for word in tokens:
@@ -196,8 +196,8 @@ def build_word_vector(tokens, size):
 # Construction des sets de training et testing pour le modèle à l'aide de build_word_vector(),
 # on va utiliser x_train puis x_test comme argument.
 
-def build_training_sets(x_set):
-    set_vec = np.concatenate([build_word_vector(x, N_DIM) for x in x_set])
+def build_training_sets(x_set, w2v_model, tfidf):
+    set_vec = np.concatenate([build_word_vector(w2v_model, tfidf, x, N_DIM) for x in x_set])
     set_vec = scale(set_vec)
     return set_vec
 
@@ -259,26 +259,80 @@ def train_model(model, train_vec, y_train, test_vec, y_test):
 
 ### Toutes nos fonctions sont prêtes, il est temps de démarrer la machine
 
-#### IMPORTING & PROCESSING SENTIMENT140:
+def engine(save_Model=False, save_W2v=False, save_Tfidf=False):
 
-#data = import_dataset()
-#data = postprocess(data)
+    #### IMPORTING & PROCESSING SENTIMENT140:
+
+    data = import_dataset()
+    data = postprocess(data)
+
+    #### SPLITTING OUR DATA:
+    # Sur 1M de données, 80% vont être utilisées pour l'entraînement, 20% pour le test de validation
+    # afin de pouvoir évaluer la performance du modèle. (1M parce qu'au delà mon OS suffoque et tue le processus)
+
+    x_train, x_test, y_train, y_test = train_test_split(np.array(data.head(1000000).tokens), np.array(data.head(1000000).sentiment), test_size=0.2, random_state=1)
+    all_data = np.array(data.tokens)
+
+    #### BUILDING THE W2V MODEL:
+
+    w2v_model = w2vmodel_builder(all_data)
+    #print(w2v_model.most_similar("food"))
+
+    #### SAVING THE W2V MODEL TO DISK:
+
+    if save_W2v:
+        save_w2vmodel(w2v_model, 'w2v_model')
+
+    #### BUILDING THE TF-IDF MATRIX:
+
+    tfidf = tfidf_builder(all_data)
+    # print('TF-IDF vocabulary size:', len(tfidf))
+
+    #### SAVING THE TF-IDF MATRIX TO DISK:
+
+    if save_Tfidf:
+        save_tfidf(tfidf, 'tfidf')
+
+    #### BUILDING THE TRAINING & TESTING SETS:
+    train_vec = build_training_sets(x_train, w2v_model, tfidf)
+    test_vec = build_training_sets(x_test, w2v_model, tfidf)
+
+    #### BUILDING OUR SEQUENTIAL MODEL WITH KERAS:
+    model = build_model()
+
+    #### TRAINING THE MODEL:
+    train_model(model, train_vec, y_train, test_vec, y_test)
+
+    #### SAVING THE MODEL TO DISK:
+    if save_Model:
+        save_modeljson(model)
+
+    return model, w2v_model, tfidf
 
 
-#### SPLITTING OUR DATA:
-# Sur 1M de données, 80% vont être utilisées pour l'entraînement, 20% pour le test de validation
-# afin de pouvoir évaluer la performance du modèle. (1M parce qu'au delà mon OS suffoque et tue le processus)
+def load_models(model_config_path, model_weights_path, w2v_path, tfidf_path):
+    try:
+        model = load_modeljson(model_config_path, model_weights_path)
+        w2v_model = load_w2vmodel(w2v_path)
+        tfidf = load_tfidf(tfidf_path)
+        return model, w2v_model, tfidf
+    except FileNotFoundError:
+        exit('No model found.\nPlease run the engine first or make sure you have the right path.')
 
-#x_train, x_test, y_train, y_test = train_test_split(np.array(data.head(1000000).tokens), np.array(data.head(1000000).sentiment), test_size=0.2, random_state=1)
-#all_data = np.array(data.tokens)
 
+#model, w2v_model, tfidf = engine()
+
+model, w2v_model, tfidf = load_models('pretrained/model_config.json', 'pretrained/model_weights.h5',
+                                      'pretrained/my_w2vmodel', 'pretrained/tfidf.pickle')
+
+#all_data, x_train, x_test, y_train, y_test = data_process()
 
 #### BUILDING THE W2V MODEL & SAVING/LOADING IT TO/FROM DISK:
 
 #w2v_model = w2vmodel_builder(all_data)
 
 #save_w2vmodel(w2v_model, "my_w2vmodel8")
-w2v_model = load_w2vmodel("pretrained/my_w2vmodel")
+#w2v_model = load_w2vmodel("pretrained/my_w2vmodel")
 
 #print(w2v_model.most_similar("food"))
 
@@ -288,7 +342,7 @@ w2v_model = load_w2vmodel("pretrained/my_w2vmodel")
 #tfidf = tfidf_builder(all_data)
 
 #save_tfidf(tfidf, "tf2")
-tfidf = load_tfidf("pretrained/tfidf.pickle")
+#tfidf = load_tfidf("pretrained/tfidf.pickle")
 
 #print('TF-IDF vocabulary size:', len(tfidf))
 
@@ -306,4 +360,4 @@ tfidf = load_tfidf("pretrained/tfidf.pickle")
 #train_model(model, train_vec, y_train, test_vec, y_test)
 
 #save_modeljson(model)
-model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
+#model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
