@@ -29,6 +29,10 @@ from tensorflow.python.keras.layers import Dense, Dropout
 from tfidf import tfidf_builder, save_tfidf, load_tfidf
 from utils import save_modeljson, load_modeljson
 
+# ceci nous permet de nous débarrasser des warnings de dépreciation
+import logging, os
+logging.disable(logging.WARNING)
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 ###################################################
 #                                                 #
