@@ -6,7 +6,7 @@ from utils import read_json, valid_json
 from filter import filter_stopwords
 import miner
 import plots
-from model import preprocess, build_word_vector, model, N_DIM
+from model import preprocess, build_word_vector, model, N_DIM, w2v_model, tfidf
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 tqdm.pandas(desc="progress-bar")
@@ -80,7 +80,7 @@ def calculate_result(result, plot=False):
 def dataset_prediction(tokens):
     tokens = np.array(tokens, dtype=object)
     print("\nAnalyzing sentiments...")
-    query_vec = np.concatenate([build_word_vector(t, N_DIM) for t in tqdm(map(lambda x: x, tokens))])
+    query_vec = np.concatenate([build_word_vector(w2v_model, tfidf, N_DIM) for t in tqdm(map(lambda x: x, tokens))])
     result = model.predict_classes(query_vec)
     calculate_result(result, True) # False si on ne veut pas de pie chart
 
@@ -92,7 +92,7 @@ def dataset_prediction(tokens):
 
 def predict_this(str):
     query_tokens = preprocess(str)
-    query_vec = build_word_vector(query_tokens, N_DIM)
+    query_vec = build_word_vector(w2v_model, tfidf, query_tokens, N_DIM)
     result = model.predict_classes(query_vec).item()
     if result == 1:
         print("POSITIVE: {%s}" % str)
