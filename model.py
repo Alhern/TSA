@@ -325,39 +325,4 @@ def load_models(model_config_path, model_weights_path, w2v_path, tfidf_path):
 model, w2v_model, tfidf = load_models('pretrained/model_config.json', 'pretrained/model_weights.h5',
                                       'pretrained/my_w2vmodel', 'pretrained/tfidf.pickle')
 
-#all_data, x_train, x_test, y_train, y_test = data_process()
 
-#### BUILDING THE W2V MODEL & SAVING/LOADING IT TO/FROM DISK:
-
-#w2v_model = w2vmodel_builder(all_data)
-
-#save_w2vmodel(w2v_model, "my_w2vmodel8")
-#w2v_model = load_w2vmodel("pretrained/my_w2vmodel")
-
-#print(w2v_model.most_similar("food"))
-
-
-#### BUILDING THE TF-IDF MATRIX & SAVING/LOADING IT TO/FROM DISK:
-
-#tfidf = tfidf_builder(all_data)
-
-#save_tfidf(tfidf, "tf2")
-#tfidf = load_tfidf("pretrained/tfidf.pickle")
-
-#print('TF-IDF vocabulary size:', len(tfidf))
-
-
-#### BUILDING THE TRAINING & TESTING SETS:
-#train_vec = build_training_sets(x_train)
-#test_vec = build_training_sets(x_test)
-
-
-#### BUILDING OUR SEQUENTIAL MODEL WITH KERAS
-#model = build_model()
-
-
-#### TRAINING THE MODEL & SAVING/LOADING IT TO/FROM DISK:
-#train_model(model, train_vec, y_train, test_vec, y_test)
-
-#save_modeljson(model)
-#model = load_modeljson("pretrained/model_config.json", "pretrained/model_weights.h5")
