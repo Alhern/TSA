@@ -23,7 +23,7 @@ You can start the program by running `./analyzer.py`
 You will then be greeted with a menu:
 
      
-    ████████ ███████  █████  
+     ████████ ███████  █████  
         ██    ██      ██   ██ 
         ██    ███████ ███████ 
         ██         ██ ██   ██ 
