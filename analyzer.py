@@ -124,16 +124,25 @@ def most_common_words(tokens, n):
 
 
 def main():
+    art = ''' 
+████████ ███████  █████  
+   ██    ██      ██   ██ 
+   ██    ███████ ███████ 
+   ██         ██ ██   ██ 
+   ██    ███████ ██   ██                          
+    '''
 
-    print("Welcome to TSA!")
+    print(art)
+    print("---Welcome to TSA---")
     print("What would you like to do?\n")
     print("\t1) Mine tweets")
     print("\t2) Validate a json file")
     print("\t3) Analyze a corpus of tweets")
     print("\t4) Find the most common words in a corpus of tweets")
     print("\t5) Predict a string")
+    print("\t6) Quit")
 
-    choice = input("\nEnter your choice: ")
+    choice = input("\nEnter your choice (1-6): ")
 
     if choice == "1":
         miner.main()
@@ -173,13 +182,16 @@ def main():
         except:
             exit(1)
 
-
     elif choice == "5":
         string = input("Enter the string you want to predict: ")
         predict_this(string)
 
+    elif choice == "6":
+        print("Bye!")
+        exit(0)
+
     else:
-        print("Invalid choice\n Please try entering 1, 2, 3 or 4.")
+        print("Invalid choice\nPlease try entering 1, 2, 3, 4 or 5.")
         exit(1)
 
 
