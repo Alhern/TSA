@@ -34,6 +34,12 @@ import logging, os
 logging.disable(logging.WARNING)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
+from sklearn.metrics import classification_report, confusion_matrix
+
+# si on veut un graphique pour la matrice de confusion
+import seaborn as sns
+import matplotlib.pylab as plt
+
 ###################################################
 #                                                 #
 #         IMPORTING THE TRAINING DATASET          #
@@ -246,7 +252,30 @@ def train_model(model, train_vec, y_train, test_vec, y_test):
 
     # Testing:
     score = model.evaluate(test_vec, y_test, batch_size=BATCH_SIZE_TEST, verbose=VERBOSE_TEST)
-    print('Test loss: %.2f%%\nTest accuracy: %.2f%%' % (score[0], score[1]))
+    print("\nModel evaluation:")
+    print('----------------------------')
+    print('Test loss: %.2f\nTest accuracy: %.2f' % (score[0], score[1]))
+
+    # Confusion matrix & classification report:
+    print("\nConfusion matrix:")
+    print('----------------------------')
+    y_pred = (model.predict(test_vec) > 0.5).astype("int32")
+    cm = confusion_matrix(y_test, y_pred)
+    print(cm)
+
+    # Confusion matrix graphical representation:
+    # df_cm = pd.DataFrame(cm, range(2), range(2))
+    # plt.figure(figsize=(8,8))
+    # plt.title("Confusion matrix")
+    # plt.ylabel("True label")
+    # plt.xlabel("Predicted label")
+    # sns.heatmap(df_cm, annot=True, cmap='flare', fmt='')
+    # plt.tight_layout()
+    # plt.show()
+
+    print('\nModel Classification report:')
+    print('----------------------------')
+    print(classification_report(y_test, y_pred, target_names=['neg', 'pos']))
 
     return history, score
 
