@@ -61,7 +61,7 @@ QUERY = []
 class Listener(StreamListener):
     def on_data(self, data):
         try:
-            with open('tweets.json', 'a', encoding="utf-8") as f:
+            with open('tweets.json', 'a+', encoding="utf-8") as f:
                 status = json.loads(data)
                 if not status['retweeted'] and 'RT @' not in status['text']:
                     if "extended_tweet" in status:
