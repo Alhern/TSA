@@ -48,7 +48,7 @@ stopwords = stopwords.words('english')
 def create_stoplist(punctuation=True, extra_punctuation=True, collection_w=True, stopword_list=False):
     stoplist = []
     if punctuation:
-        stoplist += list(string.punctuation)
+        stoplist += string.punctuation
     if extra_punctuation:
         stoplist += extra_punct
     if collection_w:
