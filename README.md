@@ -17,6 +17,14 @@ To use TSA you will need to open your virtual env and install the required files
 
     pip3 install -r requirements.txt
 
+If you use Anaconda for example, you can follow these steps:
+
+    conda create -n TSA python=3.6
+
+    conda activate TSA
+
+    pip3 install -r requirements.txt
+
 ## Usage
 You can start the program by running `./analyzer.py`
 
