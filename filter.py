@@ -1,8 +1,9 @@
 import string
 import nltk
+
 nltk.download('stopwords', quiet=True)
 from nltk.corpus import stopwords
-
+import emoji
 
 ###########################################
 ##########    STOPWORDS FILTER   ##########
@@ -20,7 +21,9 @@ from nltk.corpus import stopwords
 # ------------------------------------------
 
 # collection_words sont les mots que l'on utilise pour dataminer nos tweets, ces mots de collection
-# vont alors se retrouver dans tous ou la majorité des tweets. On va donc les enlever parce qu'ils n'apportent rien d'intéressant pour notre analyse, exemples :
+# vont alors se retrouver dans tous ou la majorité des tweets.
+# On va donc les enlever parce qu'ils n'apportent rien d'intéressant pour notre analyse,
+# exemples :
 
 collection_words_cp = ['#cyberpunk2077', 'cyberpunk', '2077', '#cyberpunk', '@cyberpunkgame']
 collection_words_trump = ['impeached', 'impeachment']
@@ -29,12 +32,10 @@ collection_words_trump = ['impeached', 'impeachment']
 
 collection_words = []
 
-
 # string.punctuation n'enlève pas toutes les ponctuations trouvées dans le dataset,
 # on va alors les rajouter dans les extra :
 
 extra_punct = ['…', '...', '’', '..', '️']
-
 
 # Les stopwords de ntlk pour la langue anglaise.
 # Les stopwords peuvent avoir un effet négatif ou positif suivant notre modèle et l'objectif recherché,
@@ -42,10 +43,15 @@ extra_punct = ['…', '...', '’', '..', '️']
 
 stopwords = stopwords.words('english')
 
+# Les emojis sont présents dans les tweets que l'on collecte,
+# ils n'ont pas d'intérêt puisque Sentiment140 n'utilise pas d'emoji, on va donc les enlever :
+
+emojis = sorted(emoji.EMOJI_DATA, key=len, reverse=True)
+
 
 # La stoplist va enfin être composée de plusieurs éléments indésirables, au choix :
 
-def create_stoplist(punctuation=True, extra_punctuation=True, collection_w=True, stopword_list=False):
+def create_stoplist(punctuation=True, extra_punctuation=True, collection_w=True, stopword_list=False, emoji_list=True):
     stoplist = []
     if punctuation:
         stoplist += string.punctuation
@@ -55,11 +61,20 @@ def create_stoplist(punctuation=True, extra_punctuation=True, collection_w=True,
         stoplist += collection_words
     if stopword_list:
         stoplist += stopwords
+    if emoji_list:
+        stoplist += emojis
     return stoplist
+
 
 # On l'initialise avec les éléments que l'on souhaite filtrer ou pas :
 
-stoplist = create_stoplist(punctuation=True, extra_punctuation=True, collection_w=True, stopword_list=False)
+stoplist = create_stoplist(
+    punctuation=True,
+    extra_punctuation=True,
+    collection_w=True,
+    stopword_list=False,
+    emoji_list=True)
+
 
 # ------------------------------------------
 
